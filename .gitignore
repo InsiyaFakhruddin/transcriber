@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual env
+.venv/
+
+# OS/editor
+.DS_Store
+.idea/
+.vscode/
+
+# App outputs & large artifacts
+MeetingTranscripts/
+outputs/
+transcripts/
+*.wav
+*.srt
+*.md  # (agar aap transcript .md repo me nahi rakhna chahte)
