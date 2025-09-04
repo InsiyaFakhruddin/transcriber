@@ -19,3 +19,12 @@ transcripts/
 *.wav
 *.srt
 *.md  # (agar aap transcript .md repo me nahi rakhna chahte)
+.venv/
+__pycache__/
+MeetingTranscripts/
+*.wav
+*.mp3
+*.flac
+*.srt
+*.vtt
+*.log
