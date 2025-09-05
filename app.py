@@ -103,8 +103,4 @@ if start_stop_btn:
         st.session_state.recording_state = start_recording()  # Record and store the state
         status_text.text(f"Recording started... Saving to: {st.session_state.recording_state.wav_path}")
         time.sleep(1)  # Short delay before button update
-<<<<<<< HEAD
         st.session_state.button_text = "Stop Recording"  # Change button text to stop
-=======
-        st.session_state.button_text = "Stop Recording"  # Change button text to stop
->>>>>>> e9dca22 (Initial commit for transcribe (moved out of transcriber))

@@ -1,30 +1,5 @@
-# Python
+.venv/
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
-
-# Virtual env
-.venv/
-
-# OS/editor
+MeetingTranscripts/
 .DS_Store
-.idea/
-.vscode/
-
-# App outputs & large artifacts
-MeetingTranscripts/
-outputs/
-transcripts/
-*.wav
-*.srt
-*.md  # (agar aap transcript .md repo me nahi rakhna chahte)
-.venv/
-__pycache__/
-MeetingTranscripts/
-*.wav
-*.mp3
-*.flac
-*.srt
-*.vtt
-*.log

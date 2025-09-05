@@ -475,8 +475,4 @@ def main():
     root.mainloop()
 
 if __name__ == "__main__":
-<<<<<<< HEAD
     main()
-=======
-    main()
->>>>>>> e9dca22 (Initial commit for transcribe (moved out of transcriber))
