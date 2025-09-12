@@ -12,6 +12,12 @@ Outputs: .md, .srt, .txt saved in ~/MeetingTranscripts
 Legal: Ensure recording/transcription complies with laws and policies where you use this.
 """
 
+import platform
+
+IS_MAC = platform.system() == "Darwin"
+IS_LINUX = platform.system() == "Linux"
+
+
 import signal
 import queue
 import threading
@@ -94,17 +100,59 @@ class RecordingState:
     wav_path: Path | None = None
     running: bool = False
 
+import platform
+import subprocess
+from pathlib import Path
+import signal
+from datetime import datetime
+
+# ---------------------------
+# OS detection
+IS_MAC = platform.system() == "Darwin"
+IS_LINUX = platform.system() == "Linux"
+# ---------------------------
+
+OUTPUT_DIR = Path.home() / "MeetingTranscripts"
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+def timestamp():
+    return datetime.now().strftime("%Y%m%d_%H%M%S")
+
+class RecordingState:
+    def __init__(self, process, wav_path, running=True):
+        self.process = process
+        self.wav_path = wav_path
+        self.running = running
+
 def start_recording(sample_rate=16000):
-    mon, mic = get_default_sources()
     out = OUTPUT_DIR / f"meeting_{timestamp()}.wav"
-    cmd = [
-        "ffmpeg", "-hide_banner", "-loglevel", "warning",
-        "-f", "pulse", "-i", mon,
-        "-f", "pulse", "-i", mic,
-        "-filter_complex", "amix=inputs=2:duration=longest:dropout_transition=3,aresample=16000,pan=mono|c0=0.5*c0+0.5*c1",
-        "-ac", "1", "-ar", str(sample_rate),
-        "-c:a", "pcm_s16le", str(out)
-    ]
+
+    if IS_MAC:
+        # macOS: AVFoundation, select audio device
+        # Replace '1' with your actual microphone ID from `ffmpeg -f avfoundation -list_devices true -i ""`
+        audio_device_id = "1"
+        cmd = [
+            "ffmpeg", "-hide_banner", "-loglevel", "warning",
+            "-f", "avfoundation", "-i", f":{audio_device_id}",
+            "-ac", "1", "-ar", str(sample_rate),
+            "-c:a", "pcm_s16le", str(out)
+        ]
+
+    elif IS_LINUX:
+        # Linux: PulseAudio
+        mon, mic = get_default_sources()  # your existing function
+        cmd = [
+            "ffmpeg", "-hide_banner", "-loglevel", "warning",
+            "-f", "pulse", "-i", mon,
+            "-f", "pulse", "-i", mic,
+            "-filter_complex", "amix=inputs=2:duration=longest:dropout_transition=3,aresample=16000,pan=mono|c0=0.5*c0+0.5*c1",
+            "-ac", "1", "-ar", str(sample_rate),
+            "-c:a", "pcm_s16le", str(out)
+        ]
+
+    else:
+        raise RuntimeError(f"Unsupported OS: {platform.system()}")
+
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     return RecordingState(process=proc, wav_path=out, running=True)
 
@@ -120,6 +168,7 @@ def stop_recording(state: RecordingState, wait_timeout=5):
     except subprocess.TimeoutExpired:
         state.process.kill()
     state.running = False
+
 
 # ---------------------- Audio helpers ----------------------
 def load_audio_mono16k(path):
